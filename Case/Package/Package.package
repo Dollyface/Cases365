@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package dslVersion="1.0.0.0" 
+        Id="45652f68-cbac-4866-b1e7-835d6f2c8e47" 
+        solutionId="45652f68-cbac-4866-b1e7-835d6f2c8e47" 
+        xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel" 
+        name="Case"
+        sharePointProductVersion="16.0">
+  <features>
+        <featureReference itemId="dc6759d5-a728-4aec-aa39-46489a03ff1a" />
+  </features>
+</package>
