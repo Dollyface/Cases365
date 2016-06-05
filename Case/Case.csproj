@@ -44,11 +44,12 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Content Include="Pages\Tags\App.html" />
     <None Include="Pages\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{0b40da9b-aaaa-4b76-bed0-b28e11ab8e94}</SharePointProjectItemId>
     </None>
+    <Content Include="Pages\App.html" />
     <Content Include="Pages\Elements.xml" />
-    <Content Include="Pages\Default.aspx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\jquery-1.9.1.min.map" />

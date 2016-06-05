@@ -1,0 +1,436 @@
+﻿<app>
+    <div class="ui top fixed blue inverted menu">
+        <div class="ui container">
+            <a class="item">Home</a>
+
+            <div class="right menu">
+                <div class="ui right aligned category search item">
+                    <div class="ui  inverted transparent icon input">
+                        <input class="prompt" type="text" placeholder="Search...">
+                        <i class="search icon"></i>
+                    </div>
+                    <div class="results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui text container">
+        <div class="ui fluid accordion">
+            <div class="ui top attached secondary segment">
+                <case-summary></case-summary>
+            </div>
+
+            <div class="ui attached secondary segment title">
+                <i class="dropdown icon"></i>
+                Details
+            </div>
+            <div class="ui attached segment content">
+                <details-form></details-form>
+            </div>
+
+            <div class="ui attached secondary segment title">
+                <i class="dropdown icon"></i>
+                Files
+            </div>
+            <div class="ui attached segment content">
+                <files-table></files-table>
+            </div>
+
+            <div class="ui attached secondary segment title">
+                <i class="dropdown icon"></i>
+                Tasks
+            </div>
+            <div class="ui attached segment content">
+                <tasks-table></tasks-table>
+            </div>
+
+            <div class="ui attached secondary segment title">
+                <i class="dropdown icon"></i>
+                Comments
+            </div>
+            <div class="ui attached segment content">
+                <comments-list></comments-list>
+            </div>
+
+            <div class="ui attached secondary segment title">
+                <i class="dropdown icon"></i>
+                Permissions
+            </div>
+            <div class="ui bottom attached segment content">
+                <permissions-table></permissions-table>
+            </div>
+        </div>
+    </div>
+
+    <form data-modal="attachment" class="ui small modal form">
+        <i class="close icon"></i>
+        <div class="header">
+            Add Attachment
+        </div>
+        <div class="content">
+            <div class="field">
+                <label>File</label>
+                <div class="ui fluid action input">
+                    <input type="text" readonly>
+                    <input type="file">
+                    <div class="ui icon top left pointing dropdown button">
+                        <i class="paste icon"></i>
+                        <div class="menu">
+                            <div class="header">Templates</div>
+                            <div class="item">Merlino 1</div>
+                            <div class="item">Merlino 2</div>
+                            <div class="item">Merlino 3</div>
+                        </div>
+                    </div>
+                    <div data-action="upload" class="ui icon button">
+                        <i class="upload icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Rename to (optional)</label>
+                <input type="text" />
+            </div>
+            <div class="field">
+                <label>Comments (optional)</label>
+                <input type="text" />
+            </div>
+        </div>
+        <div class="actions">
+            <div class="two fluid ui buttons">
+                <div class="ui red basic cancel button">
+                    <i class="remove icon"></i>
+                    Cancel
+                </div>
+                <div class="ui green basic approve button">
+                    <i class="checkmark icon"></i>
+                    Add
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <form data-modal="action" class="ui small modal form">
+        <i class="close icon"></i>
+        <div class="header">
+            Add Action
+        </div>
+        <div class="content">
+            <div class="field">
+                <label>Assigned to</label>
+                <input type="text" />
+            </div>
+            <div class="field">
+                <label>Action required</label>
+                <input type="text" />
+            </div>
+            <div class="field">
+                <label>Comments (optional)</label>
+                <input type="text" />
+            </div>
+        </div>
+        <div class="actions">
+            <div class="two fluid ui buttons">
+                <div class="ui red basic cancel button">
+                    <i class="remove icon"></i>
+                    Cancel
+                </div>
+                <div class="ui green basic approve button">
+                    <i class="checkmark icon"></i>
+                    Add
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        this.on('mount', function () {
+            $('.ui.accordion')
+              .accordion({
+                  'exclusive': false
+              });
+
+            $('.ui.dropdown')
+                .dropdown()
+            ;
+
+            $(document).on('click', '[data-show-modal]', function (event) {
+                var modal = $(this).attr('data-show-modal');
+                $('.ui.modal[data-modal="' + modal + '"]')
+                    .modal('show')
+                ;
+            });
+
+            $('[data-action="upload"]')
+                .on('click', function (e) {
+                    $('input:file', $(e.target).parents()).click();
+                })
+            ;
+
+            $('input:file', '.ui.action.input')
+                .on('change', function (e) {
+                    var name = e.target.files[0].name;
+                    $('input:text', $(e.target).parent()).val(name);
+                })
+            ;
+        });
+    </script>
+</app>
+
+<case-summary>
+    <h2>{ details.Name || details.Title }</h2>
+
+    <script>
+        var self = this;
+
+        self.on('mount', function () {
+            RiotControl.trigger('docSet_init');
+        });
+
+        RiotControl.on('docSet_changed', function (details) {
+            self.details = details;
+            self.update();
+        });
+    </script>
+</case-summary>
+
+<details-form>
+    <form class="ui form">
+        <div class="field { field.Required && 'required'}" each={ field in fields }>
+            <label for="{ 'field_' + field.StaticName }">{ field.Title }</label>
+            <input type="text" id="{ 'field_' + field.StaticName }" value="{ data[field.StaticName] }" placeholder="">
+            <div if="{ field.Description }" class="ui basic pointing label">
+                { field.Description }
+            </div>
+        </div>
+
+        <button class="ui labeled icon button">
+            <i class="delete icon"></i> Revert changes
+        </button>
+
+        <button class="ui primary labeled icon button">
+            <i class="save icon"></i> Save changes
+        </button>
+    </form>
+
+    <script>
+        var self = this;
+
+        self.on('mount', function () {
+            RiotControl.trigger('fields_init');
+            RiotControl.trigger('data_init');
+        });
+
+        RiotControl.on('fields_changed', function (fields) {
+            self.fields = $.grep(fields, function (field, index) {
+                return !field.Hidden && !field.ReadOnlyField;
+            });
+            self.update();
+        });
+
+        RiotControl.on('data_changed', function (data) {
+            self.data = data;
+            self.update();
+        });
+    </script>
+</details-form>
+
+<files-table>
+    <div>
+        <table class="ui small very basic selectable table">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th class="">Last Modified</th>
+                    <th class="collapsing"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr each={ file in files }>
+                    <td><i class="ui blue word file outline icon"></i>{ file.Name }</td>
+                    <td>Lambros Symeonakis</td>
+                    <td class="right aligned">
+                        <div class="right floated content">
+                            <div class="ui small icon button"><i class="delete icon"></i></div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="ui blue labeled icon button">
+            <i class="file outline icon"></i> Add file
+        </button>
+    </div>
+
+    <script>
+        var self = this;
+
+        self.on('mount', function () {
+            RiotControl.trigger('files_init');
+        });
+
+        RiotControl.on('files_changed', function (files) {
+            if (files) {
+                self.files = files;
+            }
+            self.update();
+        });
+    </script>
+</files-table>
+
+<tasks-table>
+    <div>
+        <table class="ui small very basic table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Assigned to</th>
+                    <th>Action required</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr each="{ task in tasks }">
+                    <td>
+                        <button class="ui small icon button { task.TaskStatus === 'Completed' ? 'green' : ''}">
+                            <i class="{ task.TaskStatus === 'Completed' ? 'checkmark box' : 'square outline' } icon"></i>
+                        </button>
+                    </td>
+                    <td>{ task.ListItemAllFields.FieldValuesAsText.AssignedTo }</td>
+                    <td>{ task.ListItemAllFields.FieldValuesAsText.Title }</td>
+                    <td>{ task.ListItemAllFields.FieldValuesAsText.Created }</td>
+                    <td class="collapsing">
+                        <div class="ui icon button">
+                            <i class="pencil icon"></i>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="ui blue labeled icon button">
+            <i class="checkmark box icon"></i> Add task
+        </button>
+    </div>
+
+    <script>
+        var self = this;
+
+        self.on('mount', function () {
+            RiotControl.trigger('tasks_init');
+        });
+
+        RiotControl.on('tasks_changed', function (tasks) {
+            self.tasks = tasks;
+            self.update();
+        });
+    </script>
+</tasks-table>
+
+<permissions-table>
+    <table class="ui small very basic table">
+        <thead>
+            <tr>
+                <th>User/Group</th>
+                <th>Permissions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr each="{ permission in permissions }">
+                <td>{ permission.Member.Title }</td>
+                <td>
+                    <span each="{ role in permission.RoleDefinitionBindings.results }">{ role.Name }</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        var self = this;
+
+        self.on('mount', function () {
+            RiotControl.trigger('permissions_init');
+        });
+
+        RiotControl.on('permissions_changed', function (permissions) {
+            self.permissions = permissions;
+            self.update();
+        });
+    </script>
+</permissions-table>
+
+<comments-list>
+    <div>
+        <div class="ui small comments">
+            <div class="comment" each="{comment in comments}">
+                <a class="avatar" data-is="comment-avatar" user-id="{comment.ListItemAllFields.AuthorId}">
+                    
+                </a>
+                <div class="content">
+                    <a class="author">{comment.ListItemAllFields.FieldValuesAsText.Author}</a>
+                    <div class="metadata">
+                        <span class="date">{comment.ListItemAllFields.Created}</span>
+                    </div>
+                    <div class="text">
+                        {comment.ListItemAllFields.FieldValuesAsText.Title}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form class="ui reply form">
+            <div class="field">
+                <label>Reply</label>
+                <input type="text" name="replyInput" onkeyup="{edit}">
+            </div>
+            <button class="ui blue labeled icon button" disabled="{!reply || !reply.length}" onclick="{ add }">
+                <i class="icon comment outline"></i> Add comment
+            </button>
+        </form>
+    </div>
+
+    <script>
+        var self = this;
+
+        self.edit = function (event) {
+            self.reply = event.target.value;
+        };
+
+        self.add = function () {
+            RiotControl.trigger('comments_add', self.reply);
+            self.reply = self.replyInput.value = '';
+        }
+
+        self.on('mount', function () {
+            RiotControl.trigger('comments_init');
+        });
+
+        RiotControl.on('comments_changed', function (comments) {
+            self.comments = comments;
+            self.update();
+        });
+    </script>
+</comments-list>
+
+<comment-avatar>
+    <img src="{pictureUrl}">
+
+    <script>
+        var self = this;
+
+        self.on('mount', function () {
+            RiotControl.trigger('users_init');
+            RiotControl.trigger('users_find', opts);
+        });
+
+        RiotControl.on('users_changed', function (users) {
+            if (users[opts.userId]) {
+                self.pictureUrl = users[opts.userId].PictureUrl;
+                self.update();
+            }
+        });
+    </script>
+</comment-avatar>

@@ -1,1 +1,7 @@
-﻿/* Place custom styles below */
+﻿body {
+    padding-top: 5em;
+}
+
+.ui.action.input input[type="file"] {
+    display: none;
+}
